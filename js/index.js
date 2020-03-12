@@ -2,25 +2,23 @@
 const NUM_OF_ROWS = 15,
   NUM_OF_COLUMNS = 20;
 
-// Object to stort ids of start node, end node, walls etc.
-let nodes = {
-  "start-node": [],
-  "end-node": [],
-  "wall-nodes": []
-};
+let START_NODE_ROW, START_NODE_COL, END_NODE_ROW, END_NODE_COL;
+
+let grid = [],
+  wall_nodes = [];
 
 let isDrawingWalls = false;
 
-const table = document.getElementById("node-table");
+const table = document.getElementById("nodes-graph");
 
 // Dynamically create a table
 for (let i = 0; i < 15; i++) {
   table_row = document.createElement("tr");
-  table_row.id = `row-${i}`;
+  table_row.id = `${i}`;
   table.appendChild(table_row);
   for (let j = 0; j < 20; j++) {
     table_column = document.createElement("td");
-    table_column.id = `row-${i}-col-${j}`;
+    table_column.id = `${i}-${j}`;
     table_row.appendChild(table_column);
   }
 }
@@ -49,28 +47,37 @@ document.addEventListener("mousedown", () => {
 
 // Add a cell to the nodes object and add the appropiate class to it
 function select_and_add_cell(cell) {
-  if (nodes["start-node"].length === 0) {
-    nodes["start-node"].push(cell.id);
+  if (START_NODE_ROW === undefined && START_NODE_COL === undefined) {
+    START_NODE_ROW = cell.id.split("-")[0];
+    START_NODE_COL = cell.id.split("-")[1];
     cell.classList.add("is-start-node");
-  } else if (nodes["end-node"].length === 0) {
-    nodes["end-node"].push(cell.id);
+  } else if (END_NODE_ROW === undefined && END_NODE_COL === undefined) {
+    END_NODE_ROW = cell.id.split("-")[0];
+    END_NODE_COL = cell.id.split("-")[1];
     cell.classList.add("is-end-node");
   } else {
-    nodes["wall-nodes"].push(cell.id);
+    wall_nodes.push(cell.id);
     cell.classList.add("is-wall-node");
   }
 }
 
 // Remove a cell from the nodes object and set the className to empty
 function deselect_and_remove_cell(cell) {
-  const nodeTypes = Object.keys(nodes);
-  nodeTypes.forEach(nodeType => {
-    if (nodes[nodeType].includes(cell.id)) {
-      i = nodes[nodeType].indexOf(cell.id);
-      nodes[nodeType].splice(i, 1);
-      cell.className = "";
-    }
-  });
+  if (wall_nodes.includes(cell.id)) {
+    i = wall_nodes.indexOf(cell.id);
+    wall_nodes.splice(i, 1);
+    cell.className = "";
+  } else if (cell.id === `${START_NODE_ROW}-${START_NODE_COL}`) {
+    START_NODE_ROW = undefined;
+    START_NODE_COL = undefined;
+    cell.className = "";
+  } else {
+    END_NODE_ROW = undefined;
+    END_NODE_COL = undefined;
+    cell.className = "";
+  }
+
+  cell.className = "";
 }
 
 function drag_and_draw_walls() {
@@ -87,15 +94,42 @@ function drag_and_draw_walls() {
          */
         if (
           isDrawingWalls &&
-          nodes["start-node"].length !== 0 &&
-          nodes["end-node"].length !== 0 &&
-          !nodes["start-node"].includes(cell.id) &&
-          !nodes["end-node"].includes(cell.id)
+          START_NODE_ROW !== undefined &&
+          START_NODE_COL !== undefined &&
+          END_NODE_ROW !== undefined &&
+          END_NODE_COL !== undefined &&
+          cell.id !== `${START_NODE_ROW}-${START_NODE_COL}` &&
+          cell.id !== `${END_NODE_ROW}-${END_NODE_COL}`
         ) {
-          nodes["wall-nodes"].push(cell.id);
+          wall_nodes.push(cell.id);
           cell.classList.add("is-wall-node");
         }
       });
     });
   });
+}
+
+function create_nodes_graph() {
+  for (let row = 0; row < NUM_OF_ROWS; row++) {
+    let currentRow = [];
+    for (let col = 0; col < NUM_OF_COLUMNS; col++) {
+      currentRow.push(add_base_node(row, col));
+    }
+    grid.push(currentRow);
+  }
+
+  console.log(grid);
+}
+
+function add_base_node(row, col) {
+  return {
+    row: row,
+    col: col,
+    "is-start-node": row === START_NODE_ROW && col === START_NODE_COL,
+    "is-end-node": row === END_NODE_ROW && col === END_NODE_COL,
+    distance: Infinity,
+    "is-visited": false,
+    "is-wall": false,
+    "previous-node": null
+  };
 }
