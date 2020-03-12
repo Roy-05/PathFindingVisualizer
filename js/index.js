@@ -1,36 +1,39 @@
 // Update later to create table size based on window size
-const NUM_OF_ROWS = 15,
-  NUM_OF_COLUMNS = 20;
+const NUM_OF_ROWS = 5,
+  NUM_OF_COLUMNS = 5,
+  table = document.getElementById("nodes-graph");
 
 let START_NODE_ROW, START_NODE_COL, END_NODE_ROW, END_NODE_COL;
 
 let grid = [],
-  wall_nodes = [];
-
-let isDrawingWalls = false;
-
-const table = document.getElementById("nodes-graph");
+  wall_nodes = [],
+  isDrawingWalls = false;
 
 // Dynamically create a table
-for (let i = 0; i < 15; i++) {
+for (let i = 0; i < NUM_OF_ROWS; i++) {
   table_row = document.createElement("tr");
   table_row.id = `${i}`;
+  let currentRow = [];
   table.appendChild(table_row);
-  for (let j = 0; j < 20; j++) {
+  for (let j = 0; j < NUM_OF_COLUMNS; j++) {
     table_column = document.createElement("td");
     table_column.id = `${i}-${j}`;
     table_row.appendChild(table_column);
+    currentRow.push(add_base_node(i, j));
   }
+  grid.push(currentRow);
 }
 
 // Add event-listeners to identify which cell is being clicked
 table.childNodes.forEach(row => {
   row.childNodes.forEach(cell => {
     cell.addEventListener("click", () => {
+      row = cell.id.split("-")[0];
+      col = cell.id.split("-")[1];
       if (cell.classList.length !== 0) {
-        deselect_and_remove_cell(cell);
+        deselect_cell(cell, row, col);
       } else {
-        select_and_add_cell(cell);
+        select_and_add_cell(cell, row, col);
       }
     });
   });
@@ -46,37 +49,39 @@ document.addEventListener("mousedown", () => {
 });
 
 // Add a cell to the nodes object and add the appropiate class to it
-function select_and_add_cell(cell) {
+function select_and_add_cell(cell, row, col) {
   if (START_NODE_ROW === undefined && START_NODE_COL === undefined) {
-    START_NODE_ROW = cell.id.split("-")[0];
-    START_NODE_COL = cell.id.split("-")[1];
+    START_NODE_ROW = row;
+    START_NODE_COL = col;
     cell.classList.add("is-start-node");
+    update_node(row, col, true, false, false);
   } else if (END_NODE_ROW === undefined && END_NODE_COL === undefined) {
-    END_NODE_ROW = cell.id.split("-")[0];
-    END_NODE_COL = cell.id.split("-")[1];
+    END_NODE_ROW = row;
+    END_NODE_COL = col;
     cell.classList.add("is-end-node");
+    update_node(row, col, false, true, false);
   } else {
-    wall_nodes.push(cell.id);
     cell.classList.add("is-wall-node");
+    update_node(row, col, false, false, true);
   }
 }
 
-// Remove a cell from the nodes object and set the className to empty
-function deselect_and_remove_cell(cell) {
-  if (wall_nodes.includes(cell.id)) {
-    i = wall_nodes.indexOf(cell.id);
-    wall_nodes.splice(i, 1);
-    cell.className = "";
-  } else if (cell.id === `${START_NODE_ROW}-${START_NODE_COL}`) {
+/**
+ * Remove a cell from the nodes object and set the className to empty
+ * @param {HTMLElement} cell The cell to deselct
+ * @param {int} row The row number
+ * @param {int} col The column number
+ */
+function deselect_cell(cell, row, col) {
+  if (cell.id === `${START_NODE_ROW}-${START_NODE_COL}`) {
     START_NODE_ROW = undefined;
     START_NODE_COL = undefined;
-    cell.className = "";
   } else {
     END_NODE_ROW = undefined;
     END_NODE_COL = undefined;
-    cell.className = "";
   }
 
+  update_node(row, col, false, false, false);
   cell.className = "";
 }
 
@@ -101,26 +106,21 @@ function drag_and_draw_walls() {
           cell.id !== `${START_NODE_ROW}-${START_NODE_COL}` &&
           cell.id !== `${END_NODE_ROW}-${END_NODE_COL}`
         ) {
-          wall_nodes.push(cell.id);
           cell.classList.add("is-wall-node");
+          row = cell.id.split("-")[0];
+          col = cell.id.split("-")[1];
+          update_node(row, col, false, false, true);
         }
       });
     });
   });
 }
 
-function create_nodes_graph() {
-  for (let row = 0; row < NUM_OF_ROWS; row++) {
-    let currentRow = [];
-    for (let col = 0; col < NUM_OF_COLUMNS; col++) {
-      currentRow.push(add_base_node(row, col));
-    }
-    grid.push(currentRow);
-  }
-
-  console.log(grid);
-}
-
+/**
+ *
+ * @param {int} row The row number
+ * @param {int} col The column number
+ */
 function add_base_node(row, col) {
   return {
     row: row,
@@ -132,4 +132,24 @@ function add_base_node(row, col) {
     "is-wall": false,
     "previous-node": null
   };
+}
+
+/**
+ *
+ * @param {int} row The row number
+ * @param {int} col The column number
+ * @param {boolean} isStartNode Identify if it is the start node
+ * @param {boolean} isEndNode Identify if it is the end node
+ * @param {boolean} isWall Identify if it is the wall node
+ */
+function update_node(row, col, isStartNode, isEndNode, isWall) {
+  node = grid[row][col];
+  newNode = {
+    ...node,
+    "is-start-node": isStartNode,
+    "is-end-node": isEndNode,
+    "is-wall": isWall
+  };
+
+  grid[row][col] = newNode;
 }
