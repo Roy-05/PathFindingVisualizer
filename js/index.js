@@ -9,6 +9,8 @@ let nodes = {
   "wall-nodes": []
 };
 
+let isDrawingWalls = false;
+
 const table = document.getElementById("node-table");
 
 // Dynamically create a table
@@ -35,6 +37,42 @@ table.childNodes.forEach(row => {
     });
   });
 });
+
+document.addEventListener("mouseup", () => {
+  isDrawingWalls = false;
+});
+
+document.addEventListener("mousedown", () => {
+  isDrawingWalls = true;
+  draw_walls();
+});
+
+function draw_walls() {
+  table.childNodes.forEach(row => {
+    row.childNodes.forEach(cell => {
+      cell.addEventListener("mouseenter", () => {
+        /**
+         * Draw walls only when:
+         * 1. Mousedown is firing (isdrawingWalls is true)
+         * 2. start-node has been defined
+         * 3. end-node has been defined
+         * 4. wall to be drawn is NOT the start-node
+         * 5. wall to be drawn is NOT the end-node
+         */
+        if (
+          isDrawingWalls &&
+          nodes["start-node"].length !== 0 &&
+          nodes["end-node"].length !== 0 &&
+          !nodes["start-node"].includes(cell.id) &&
+          !nodes["end-node"].includes(cell.id)
+        ) {
+          nodes["wall-nodes"].push(cell.id);
+          cell.classList.add("is-wall-node");
+        }
+      });
+    });
+  });
+}
 
 // Add a cell to the nodes object and add the appropiate class to it
 function select_and_add_cell(cell) {
