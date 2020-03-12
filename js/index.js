@@ -1,6 +1,6 @@
 // Update later to create table size based on window size
-const NUM_OF_ROWS = 5,
-  NUM_OF_COLUMNS = 5,
+const NUM_OF_ROWS = 10,
+  NUM_OF_COLUMNS = 10,
   table = document.getElementById("nodes-graph");
 
 let START_NODE_ROW, START_NODE_COL, END_NODE_ROW, END_NODE_COL;
@@ -33,7 +33,7 @@ table.childNodes.forEach(row => {
       if (cell.classList.length !== 0) {
         deselect_cell(cell, row, col);
       } else {
-        select_and_add_cell(cell, row, col);
+        select_cell(cell, row, col);
       }
     });
   });
@@ -49,7 +49,7 @@ document.addEventListener("mousedown", () => {
 });
 
 // Add a cell to the nodes object and add the appropiate class to it
-function select_and_add_cell(cell, row, col) {
+function select_cell(cell, row, col) {
   if (START_NODE_ROW === undefined && START_NODE_COL === undefined) {
     START_NODE_ROW = row;
     START_NODE_COL = col;
