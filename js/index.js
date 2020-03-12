@@ -9,7 +9,7 @@ let nodes = {
   "wall-nodes": []
 };
 
-table = document.getElementById("node-table");
+const table = document.getElementById("node-table");
 
 // Dynamically create a table
 for (let i = 0; i < 15; i++) {
@@ -27,16 +27,34 @@ for (let i = 0; i < 15; i++) {
 table.childNodes.forEach(row => {
   row.childNodes.forEach(cell => {
     cell.addEventListener("click", () => {
-      if (nodes["start-node"].length === 0) {
-        nodes["start-node"].push(cell.id);
-        cell.className = " is-start-node ";
-      } else if (nodes["end-node"].length === 0) {
-        nodes["end-node"].push(cell.id);
-        cell.className = " is-end-node ";
+      if (cell.classList.length !== 0) {
+        deselect_cell(cell.id);
+        cell.className = "";
       } else {
-        nodes["wall-nodes"].push(cell.id);
-        cell.className = " is-wall-node ";
+        if (nodes["start-node"].length === 0) {
+          nodes["start-node"].push(cell.id);
+          cell.classList.add("is-start-node");
+        } else if (nodes["end-node"].length === 0) {
+          nodes["end-node"].push(cell.id);
+          cell.classList.add("is-end-node");
+        } else {
+          nodes["wall-nodes"].push(cell.id);
+          cell.classList.add("is-wall-node");
+        }
       }
     });
   });
 });
+
+function deselect_cell(id) {
+  const nodeTypes = Object.keys(nodes);
+  nodeTypes.forEach(nodeType => {
+    if (nodes[nodeType].includes(id)) {
+      i = nodes[nodeType].indexOf(id);
+      nodes[nodeType].splice(i, 1);
+      return true;
+    }
+  });
+
+  return false;
+}
