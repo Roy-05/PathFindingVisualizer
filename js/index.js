@@ -76,7 +76,7 @@ function deselect_cell(cell, row, col) {
   if (cell.id === `${START_NODE_ROW}-${START_NODE_COL}`) {
     START_NODE_ROW = undefined;
     START_NODE_COL = undefined;
-  } else {
+  } else if (cell.id === `${END_NODE_ROW}-${END_NODE_COL}`) {
     END_NODE_ROW = undefined;
     END_NODE_COL = undefined;
   }
