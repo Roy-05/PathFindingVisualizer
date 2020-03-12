@@ -15,11 +15,12 @@ html {
 
 #node-table {
   margin: 0 auto;
+  border-spacing: 1px;
 }
 
 td {
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
   border: solid 1px black;
 }
 
