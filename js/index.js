@@ -28,33 +28,36 @@ table.childNodes.forEach(row => {
   row.childNodes.forEach(cell => {
     cell.addEventListener("click", () => {
       if (cell.classList.length !== 0) {
-        deselect_cell(cell.id);
-        cell.className = "";
+        deselect_and_remove_cell(cell);
       } else {
-        if (nodes["start-node"].length === 0) {
-          nodes["start-node"].push(cell.id);
-          cell.classList.add("is-start-node");
-        } else if (nodes["end-node"].length === 0) {
-          nodes["end-node"].push(cell.id);
-          cell.classList.add("is-end-node");
-        } else {
-          nodes["wall-nodes"].push(cell.id);
-          cell.classList.add("is-wall-node");
-        }
+        select_and_add_cell(cell);
       }
     });
   });
 });
 
-function deselect_cell(id) {
+// Add a cell to the nodes object and add the appropiate class to it
+function select_and_add_cell(cell) {
+  if (nodes["start-node"].length === 0) {
+    nodes["start-node"].push(cell.id);
+    cell.classList.add("is-start-node");
+  } else if (nodes["end-node"].length === 0) {
+    nodes["end-node"].push(cell.id);
+    cell.classList.add("is-end-node");
+  } else {
+    nodes["wall-nodes"].push(cell.id);
+    cell.classList.add("is-wall-node");
+  }
+}
+
+// Remove a cell from the nodes object and set the className to empty
+function deselect_and_remove_cell(cell) {
   const nodeTypes = Object.keys(nodes);
   nodeTypes.forEach(nodeType => {
-    if (nodes[nodeType].includes(id)) {
-      i = nodes[nodeType].indexOf(id);
+    if (nodes[nodeType].includes(cell.id)) {
+      i = nodes[nodeType].indexOf(cell.id);
       nodes[nodeType].splice(i, 1);
-      return true;
+      cell.className = "";
     }
   });
-
-  return false;
 }
