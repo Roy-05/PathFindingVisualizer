@@ -54,15 +54,15 @@ function select_cell(cell, row, col) {
     START_NODE_ROW = row;
     START_NODE_COL = col;
     cell.classList.add("is-start-node");
-    update_node(row, col, true, false, false);
+    update_node(row, col, "start-node");
   } else if (END_NODE_ROW === undefined && END_NODE_COL === undefined) {
     END_NODE_ROW = row;
     END_NODE_COL = col;
     cell.classList.add("is-end-node");
-    update_node(row, col, false, true, false);
+    update_node(row, col, "end-node");
   } else {
     cell.classList.add("is-wall-node");
-    update_node(row, col, false, false, true);
+    update_node(row, col, "wall-node");
   }
 }
 
@@ -81,7 +81,7 @@ function deselect_cell(cell, row, col) {
     END_NODE_COL = undefined;
   }
 
-  update_node(row, col, false, false, false);
+  update_node(row, col, null);
   cell.className = "";
 }
 
@@ -109,7 +109,7 @@ function drag_and_draw_walls() {
           cell.classList.add("is-wall-node");
           row = cell.id.split("-")[0];
           col = cell.id.split("-")[1];
-          update_node(row, col, false, false, true);
+          update_node(row, col, "wall-node");
         }
       });
     });
@@ -122,14 +122,21 @@ function drag_and_draw_walls() {
  * @param {int} col The column number
  */
 function add_base_node(row, col) {
+  let nodeType;
+  if (row === START_NODE_ROW && col === START_NODE_COL) {
+    nodeType = "start-node";
+  } else if (row === END_NODE_ROW && col === END_NODE_COL) {
+    nodeType = "end-node";
+  } else {
+    nodeType = null;
+  }
+
   return {
     row: row,
     col: col,
-    "is-start-node": row === START_NODE_ROW && col === START_NODE_COL,
-    "is-end-node": row === END_NODE_ROW && col === END_NODE_COL,
+    "node-type": nodeType,
     distance: Infinity,
     "is-visited": false,
-    "is-wall": false,
     "previous-node": null
   };
 }
@@ -138,17 +145,13 @@ function add_base_node(row, col) {
  *
  * @param {int} row The row number
  * @param {int} col The column number
- * @param {boolean} isStartNode Identify if it is the start node
- * @param {boolean} isEndNode Identify if it is the end node
- * @param {boolean} isWall Identify if it is the wall node
+ * @param {boolean} nodeType Identify if the node is a start, end, or wall node
  */
-function update_node(row, col, isStartNode, isEndNode, isWall) {
+function update_node(row, col, nodeType) {
   node = grid[row][col];
   newNode = {
     ...node,
-    "is-start-node": isStartNode,
-    "is-end-node": isEndNode,
-    "is-wall": isWall
+    "node-type": nodeType
   };
 
   grid[row][col] = newNode;
