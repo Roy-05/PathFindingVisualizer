@@ -43,9 +43,27 @@ document.addEventListener("mouseup", () => {
   isDrawingWalls = false;
 });
 
-document.addEventListener("mousedown", () => {
-  isDrawingWalls = true;
-  drag_and_draw_walls();
+table.childNodes.forEach(row => {
+  row.childNodes.forEach(cell => {
+    cell.addEventListener("mousedown", () => {
+      isDrawingWalls = true;
+      if (
+        isDrawingWalls &&
+        START_NODE_ROW !== undefined &&
+        START_NODE_COL !== undefined &&
+        END_NODE_ROW !== undefined &&
+        END_NODE_COL !== undefined &&
+        cell.id !== `${START_NODE_ROW}-${START_NODE_COL}` &&
+        cell.id !== `${END_NODE_ROW}-${END_NODE_COL}`
+      ) {
+        cell.classList.add("is-wall-node");
+        row = cell.id.split("-")[0];
+        col = cell.id.split("-")[1];
+        update_node(row, col, "wall-node");
+      }
+      drag_and_draw_walls();
+    });
+  });
 });
 
 // Add a cell to the nodes object and add the appropiate class to it
