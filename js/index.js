@@ -17,6 +17,7 @@ for (let i = 0; i < NUM_OF_ROWS; i++) {
   table.appendChild(table_row);
   for (let j = 0; j < NUM_OF_COLUMNS; j++) {
     table_column = document.createElement("td");
+    table_column.className = `table-cell`;
     table_column.id = `${i}-${j}`;
     table_row.appendChild(table_column);
     currentRow.push(add_base_node(i, j));
@@ -25,17 +26,16 @@ for (let i = 0; i < NUM_OF_ROWS; i++) {
 }
 
 // Add event-listeners to identify which cell is being clicked
-table.childNodes.forEach(row => {
-  row.childNodes.forEach(cell => {
-    cell.addEventListener("click", () => {
-      row = cell.id.split("-")[0];
-      col = cell.id.split("-")[1];
-      if (cell.classList.length !== 0) {
-        deselect_cell(cell, row, col);
-      } else {
-        select_cell(cell, row, col);
-      }
-    });
+document.querySelectorAll(".table-cell").forEach(cell => {
+  cell.addEventListener("click", () => {
+    row = cell.id.split("-")[0];
+    col = cell.id.split("-")[1];
+    if (cell.classList.length > 1) {
+      console.log(cell.classList);
+      deselect_cell(cell, row, col);
+    } else {
+      select_cell(cell, row, col);
+    }
   });
 });
 
@@ -43,26 +43,10 @@ document.addEventListener("mouseup", () => {
   isDrawingWalls = false;
 });
 
-table.childNodes.forEach(row => {
-  row.childNodes.forEach(cell => {
-    cell.addEventListener("mousedown", () => {
-      isDrawingWalls = true;
-      if (
-        isDrawingWalls &&
-        START_NODE_ROW !== undefined &&
-        START_NODE_COL !== undefined &&
-        END_NODE_ROW !== undefined &&
-        END_NODE_COL !== undefined &&
-        cell.id !== `${START_NODE_ROW}-${START_NODE_COL}` &&
-        cell.id !== `${END_NODE_ROW}-${END_NODE_COL}`
-      ) {
-        cell.classList.add("is-wall-node");
-        row = cell.id.split("-")[0];
-        col = cell.id.split("-")[1];
-        update_node(row, col, "wall-node");
-      }
-      drag_and_draw_walls();
-    });
+document.querySelectorAll(".table-cell").forEach(cell => {
+  cell.addEventListener("mousedown", () => {
+    isDrawingWalls = true;
+    drag_and_draw_walls();
   });
 });
 
@@ -104,32 +88,30 @@ function deselect_cell(cell, row, col) {
 }
 
 function drag_and_draw_walls() {
-  table.childNodes.forEach(row => {
-    row.childNodes.forEach(cell => {
-      cell.addEventListener("mouseenter", () => {
-        /**
-         * Draw walls only when:
-         * 1. Mousedown is firing (isdrawingWalls is true)
-         * 2. start-node has been defined
-         * 3. end-node has been defined
-         * 4. wall to be drawn is NOT the start-node
-         * 5. wall to be drawn is NOT the end-node
-         */
-        if (
-          isDrawingWalls &&
-          START_NODE_ROW !== undefined &&
-          START_NODE_COL !== undefined &&
-          END_NODE_ROW !== undefined &&
-          END_NODE_COL !== undefined &&
-          cell.id !== `${START_NODE_ROW}-${START_NODE_COL}` &&
-          cell.id !== `${END_NODE_ROW}-${END_NODE_COL}`
-        ) {
-          cell.classList.add("is-wall-node");
-          row = cell.id.split("-")[0];
-          col = cell.id.split("-")[1];
-          update_node(row, col, "wall-node");
-        }
-      });
+  document.querySelectorAll(".table-cell").forEach(cell => {
+    cell.addEventListener("mouseenter", () => {
+      /**
+       * Draw walls only when:
+       * 1. Mousedown is firing (isdrawingWalls is true)
+       * 2. start-node has been defined
+       * 3. end-node has been defined
+       * 4. wall to be drawn is NOT the start-node
+       * 5. wall to be drawn is NOT the end-node
+       */
+      if (
+        isDrawingWalls &&
+        START_NODE_ROW !== undefined &&
+        START_NODE_COL !== undefined &&
+        END_NODE_ROW !== undefined &&
+        END_NODE_COL !== undefined &&
+        cell.id !== `${START_NODE_ROW}-${START_NODE_COL}` &&
+        cell.id !== `${END_NODE_ROW}-${END_NODE_COL}`
+      ) {
+        cell.classList.add("is-wall-node");
+        row = cell.id.split("-")[0];
+        col = cell.id.split("-")[1];
+        update_node(row, col, "wall-node");
+      }
     });
   });
 }
