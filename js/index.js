@@ -75,13 +75,16 @@ function deselect_cell(cell, row, col) {
   if (cell.id === `${START_NODE_ROW}-${START_NODE_COL}`) {
     START_NODE_ROW = undefined;
     START_NODE_COL = undefined;
+    cell.classList.remove("is-start-node");
   } else if (cell.id === `${END_NODE_ROW}-${END_NODE_COL}`) {
     END_NODE_ROW = undefined;
     END_NODE_COL = undefined;
+    cell.classList.remove("is-end-node");
+  } else {
+    cell.classList.remove("is-wall-node");
   }
 
   update_node(row, col, null);
-  cell.className = "";
 }
 
 function drag_and_draw_walls() {
