@@ -44,10 +44,7 @@ document.addEventListener("mouseup", () => {
 });
 
 document.querySelectorAll(".table-cell").forEach(cell => {
-  cell.addEventListener("mousedown", () => {
-    isDrawingWalls = true;
-    drag_and_draw_walls();
-  });
+  cell.addEventListener("mousedown", drag_and_draw_walls);
 });
 
 // Add a cell to the nodes object and add the appropiate class to it
@@ -88,6 +85,7 @@ function deselect_cell(cell, row, col) {
 }
 
 function drag_and_draw_walls() {
+  isDrawingWalls = true;
   document.querySelectorAll(".table-cell").forEach(cell => {
     cell.addEventListener("mouseenter", () => {
       /**
